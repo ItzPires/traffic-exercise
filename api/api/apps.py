@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class TrafficConfig(AppConfig):
+class APIConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'traffic'
+    name = 'api'
