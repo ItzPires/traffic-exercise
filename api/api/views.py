@@ -37,14 +37,24 @@ class CSVUploadView(APIView):
                 road_segment = RoadSegment.objects.create(
                     start_point=start_point,
                     end_point=end_point,
-                    length=length,
-                    speed=speed,
+                    length=length
                 )
+                
+                SpeedReading.objects.create(
+                    road_segment=road_segment,
+                    speed=float(speed)
+                )
+
                 created_segments.append(road_segment.id)
+
             except Exception as e:
                 return JsonResponse({"error": f"Error while processing line {row}: {str(e)}"}, status=400)
 
-        return JsonResponse({"message": "CSV successfully processed", "created_segments": created_segments}, status=200)
+        return JsonResponse({
+            "message": "CSV successfully processed",
+            "created_segments": created_segments,
+            "readings_created": len(created_segments)
+        }, status=201)
 
 class RoadSegmentViewSet(viewsets.ModelViewSet):
     queryset = RoadSegment.objects.all()
