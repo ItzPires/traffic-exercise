@@ -21,10 +21,10 @@ class RoadSegment(models.Model):
         thresholds = TrafficIntensityThreshold.current()
         
         if speed > thresholds.medium_max:
-            return "high"
+            return "low"
         elif speed <= thresholds.medium_max and speed > thresholds.medium_min:
             return "medium"
-        return "low"
+        return "high"
 
 class SpeedReading(models.Model):
     road_segment = models.ForeignKey(RoadSegment, related_name='readings', on_delete=models.CASCADE)
