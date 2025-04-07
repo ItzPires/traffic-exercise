@@ -76,27 +76,5 @@ class TrafficIntensityThresholdViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
 
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        
-        # Validate thresholds
-        medium_min = serializer.validated_data.get('medium_min')
-        medium_max = serializer.validated_data.get('medium_max')
-        
-        if medium_min >= medium_max:
-            return Response(
-                {"error": "medium_min must be less than medium_max"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(
-            serializer.data,
-            status=status.HTTP_201_CREATED,
-            headers=headers
-        )
-
     def get_queryset(self):
         return TrafficIntensityThreshold.objects.all().order_by('-created_at')[:1]

@@ -50,3 +50,15 @@ class TrafficIntensityThreshold(models.Model):
     @classmethod
     def current(cls):
         return cls.objects.first() or cls()
+
+    # Validation of the model
+    def clean(self):
+        if self.medium_min >= self.medium_max:
+            raise ValidationError({
+                'medium_min': 'Must be less than medium_max',
+                'medium_max': 'Must be greater than medium_min'
+            })
+
+    def save(self, *args, **kwargs):
+        self.full_clean()  # Before saving, call clean() to validate the model
+        super().save(*args, **kwargs)
