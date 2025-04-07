@@ -84,7 +84,7 @@ class TrafficObservationSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         license_plate = validated_data.pop('license_plate')
-        sensor = validated_data.pop('sensor')
+        sensor = validated_data.pop('sensor_uuid')
         
         car, carCreated  = Car.objects.get_or_create(
             license_plate=license_plate

@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework import status, viewsets, permissions
 from django.http import JsonResponse
 from .serializers import RoadSegmentSerializer, SpeedReadingSerializer, TrafficIntensityThresholdSerializer, CarSerializer, SensorSerializer, TrafficObservationSerializer
-from .permissions import IsAdminOrReadOnly, SensorAPIPermission
+from .permissions import IsAdminOrReadOnly, SensorAPIOnlyPermission
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
@@ -122,7 +122,7 @@ class SensorViewSet(viewsets.ModelViewSet):
 class TrafficObservationViewSet(viewsets.ModelViewSet):
     queryset = TrafficObservation.objects.all()
     serializer_class = TrafficObservationSerializer
-    permission_classes = [IsAdminOrReadOnly]
+    permission_classes = [SensorAPIOnlyPermission]
     http_method_names = ['get', 'post', 'head'] # Disable PUT/PATCH/DELETE
     
     def create(self, request, *args, **kwargs):
