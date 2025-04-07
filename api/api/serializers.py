@@ -3,7 +3,7 @@ from .models import RoadSegment, SpeedReading
 
 class RoadSegmentSerializer(serializers.ModelSerializer):
     readings_count = serializers.SerializerMethodField()
-    traffic_intensity = serializers.SerializerMethodField()
+    traffic_intensity = serializers.ReadOnlyField()
     
     class Meta:
         model = RoadSegment
@@ -16,6 +16,8 @@ class RoadSegmentSerializer(serializers.ModelSerializer):
         return obj.traffic_intensity
 
 class SpeedReadingSerializer(serializers.ModelSerializer):
+    traffic_intensity = serializers.ReadOnlyField()
+
     class Meta:
         model = SpeedReading
         fields = '__all__'
