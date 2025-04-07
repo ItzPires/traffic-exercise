@@ -35,7 +35,7 @@ def import_road_segments():
             try:
                 id, start_lon, start_lat, end_lon, end_lat, length, speed = row[0], row[1], row[2], row[3], row[4], row[5], row[6]
                 
-                RoadSegment.objects.create(
+                road_segment = RoadSegment.objects.create(
                     start_point=Point(float(start_lon), float(start_lat)),
                     end_point=Point(float(end_lon), float(end_lat)),
                     length=float(length)
