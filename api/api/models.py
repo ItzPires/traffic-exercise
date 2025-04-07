@@ -14,7 +14,7 @@ class RoadSegment(models.Model):
         
         if self.speed > thresholds.medium_max:
             return "high"
-        elif self.speed <= thresholds.medium_max <= and self.speed >= thresholds.low_min:
+        elif self.speed <= thresholds.medium_max <= and self.speed > thresholds.low_min:
             return "medium"
         return "low"
 
