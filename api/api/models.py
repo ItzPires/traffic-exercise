@@ -26,6 +26,11 @@ class RoadSegment(models.Model):
             return "medium"
         return "high"
 
+    @property
+    def updated_at(self):
+        last_reading = self.readings.order_by('-created_at').first()
+        return last_reading.created_at if last_reading else self.created_at
+
 class SpeedReading(models.Model):
     road_segment = models.ForeignKey(RoadSegment, related_name='readings', on_delete=models.CASCADE)
     speed = models.FloatField()
