@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import RoadSegment, SpeedReading, TrafficIntensityThreshold
+from .models import RoadSegment, SpeedReading, TrafficIntensityThreshold, Sensor, Car, TrafficObservation
 
 class RoadSegmentSerializer(serializers.ModelSerializer):
     current_speed = serializers.SerializerMethodField()
@@ -35,3 +35,63 @@ class TrafficIntensityThresholdSerializer(serializers.ModelSerializer):
     class Meta:
         model = TrafficIntensityThreshold
         fields = '__all__'
+
+class CarSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Car
+        fields = '__all__'
+
+class SensorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Sensor
+        fields = '__all__'
+
+class TrafficObservationSerializer(serializers.ModelSerializer):
+    road_segment = serializers.PrimaryKeyRelatedField(queryset=RoadSegment.objects.all())
+    license_plate = serializers.CharField(write_only=True)
+    sensor_uuid = serializers.SlugRelatedField(queryset=Sensor.objects.all(), slug_field='uuid', write_only=True)
+    
+    # Get car and sensor details
+    car = serializers.SerializerMethodField()
+    sensor = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = TrafficObservation
+        fields = [
+            'id',
+            'road_segment',
+            'license_plate',
+            'sensor_uuid',
+            'timestamp',
+            'created_at',
+            'car',
+            'sensor'
+        ]
+        read_only_fields = ['id', 'created_at', 'car', 'sensor']
+
+    def get_car(self, obj):
+        return {
+            'license_plate': obj.car.license_plate,
+            'created_at': obj.car.created_at
+        }
+
+    def get_sensor(self, obj):
+        return {
+            'id': obj.sensor.id,
+            'uuid': str(obj.sensor.uuid),
+            'name': obj.sensor.name
+        }
+
+    def create(self, validated_data):
+        license_plate = validated_data.pop('license_plate')
+        sensor = validated_data.pop('sensor')
+        
+        car, carCreated  = Car.objects.get_or_create(
+            license_plate=license_plate
+        )
+        
+        return TrafficObservation.objects.create(
+            car=car,
+            sensor=sensor,
+            **validated_data
+        )

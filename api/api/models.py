@@ -62,3 +62,23 @@ class TrafficIntensityThreshold(models.Model):
     def save(self, *args, **kwargs):
         self.full_clean()  # Before saving, call clean() to validate the model
         super().save(*args, **kwargs)
+
+class Sensor(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=100)
+    uuid = models.UUIDField(unique=True, editable=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+class Car(models.Model):
+    license_plate = models.CharField(max_length=20, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+class TrafficObservation(models.Model):
+    road_segment = models.ForeignKey(RoadSegment, on_delete=models.CASCADE)
+    car = models.ForeignKey(Car, on_delete=models.CASCADE)
+    sensor = models.ForeignKey(Sensor, on_delete=models.CASCADE)
+    timestamp = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-timestamp']

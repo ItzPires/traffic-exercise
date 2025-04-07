@@ -1,13 +1,13 @@
 import csv
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser
-from .models import RoadSegment, SpeedReading, TrafficIntensityThreshold
+from .models import RoadSegment, SpeedReading, TrafficIntensityThreshold, Car, Sensor, TrafficObservation
 from django.contrib.gis.geos import Point
 from rest_framework.response import Response
 from rest_framework import status, viewsets, permissions
 from django.http import JsonResponse
-from .serializers import RoadSegmentSerializer, SpeedReadingSerializer, TrafficIntensityThresholdSerializer
-from .permissions import IsAdminOrReadOnly
+from .serializers import RoadSegmentSerializer, SpeedReadingSerializer, TrafficIntensityThresholdSerializer, CarSerializer, SensorSerializer, TrafficObservationSerializer
+from .permissions import IsAdminOrReadOnly, SensorAPIPermission
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
@@ -106,3 +106,32 @@ class TrafficIntensityThresholdViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return TrafficIntensityThreshold.objects.all().order_by('-created_at')[:1]
+
+class CarViewSet(viewsets.ModelViewSet):
+    queryset = Car.objects.all()
+    serializer_class = CarSerializer
+    permission_classes = [IsAdminOrReadOnly]
+    http_method_names = ['get', 'post', 'delete', 'head'] # Disable PUT/PATCH
+
+class SensorViewSet(viewsets.ModelViewSet):
+    queryset = Sensor.objects.all()
+    serializer_class = SensorSerializer
+    permission_classes = [IsAdminOrReadOnly]
+    http_method_names = ['get', 'post', 'delete', 'head'] # Disable PUT/PATCH
+
+class TrafficObservationViewSet(viewsets.ModelViewSet):
+    queryset = TrafficObservation.objects.all()
+    serializer_class = TrafficObservationSerializer
+    permission_classes = [IsAdminOrReadOnly]
+    http_method_names = ['get', 'post', 'head'] # Disable PUT/PATCH/DELETE
+    
+    def create(self, request, *args, **kwargs):
+        if isinstance(request.data, list):  # Bulk create
+            serializer = self.get_serializer(data=request.data, many=True)
+        else:  # Single create
+            serializer = self.get_serializer(data=request.data)
+            
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
