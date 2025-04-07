@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import RoadSegment, SpeedReading
+from .models import RoadSegment, SpeedReading, TrafficIntensityThreshold
 
 class RoadSegmentSerializer(serializers.ModelSerializer):
     current_speed = serializers.SerializerMethodField()
@@ -29,4 +29,9 @@ class SpeedReadingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SpeedReading
+        fields = '__all__'
+
+class TrafficIntensityThresholdSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TrafficIntensityThreshold
         fields = '__all__'
