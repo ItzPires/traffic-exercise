@@ -5,9 +5,12 @@ while ! nc -z db 5432; do
   sleep 1
 done
 
-# Migrations
-python manage.py makemigrations
-python manage.py migrate
+# Always run migrations
+python manage.py makemigrations --noinput
+python manage.py migrate --noinput
+
+# Upload default data
+python init.py
 
 # Start the Django server
 python manage.py runserver 0.0.0.0:8000
