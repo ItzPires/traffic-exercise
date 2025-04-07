@@ -1,12 +1,17 @@
 import csv
-from django.http import JsonResponse
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser
-from .models import RoadSegment
+from .models import RoadSegment, SpeedReading
 from django.contrib.gis.geos import Point
+from rest_framework.response import Response
+from rest_framework import status, viewsets, permissions
+from django.http import JsonResponse
+from .serializers import RoadSegmentSerializer, SpeedReadingSerializer
+from .permissions import IsAdminOrReadOnly
 
 class CSVUploadView(APIView):
     parser_classes = (MultiPartParser, FormParser)
+    permission_classes = [IsAdminOrReadOnly]
     
     def post(self, request, *args, **kwargs):
         # Verify if is a CSV file
@@ -40,3 +45,13 @@ class CSVUploadView(APIView):
                 return JsonResponse({"error": f"Error while processing line {row}: {str(e)}"}, status=400)
 
         return JsonResponse({"message": "CSV successfully processed", "created_segments": created_segments}, status=200)
+
+class RoadSegmentViewSet(viewsets.ModelViewSet):
+    queryset = RoadSegment.objects.all()
+    serializer_class = RoadSegmentSerializer
+    permission_classes = [IsAdminOrReadOnly]
+
+class SpeedReadingViewSet(viewsets.ModelViewSet):
+    queryset = SpeedReading.objects.all()
+    serializer_class = SpeedReadingSerializer
+    permission_classes = [IsAdminOrReadOnly]
