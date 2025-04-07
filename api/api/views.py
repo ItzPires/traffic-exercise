@@ -8,6 +8,8 @@ from rest_framework import status, viewsets, permissions
 from django.http import JsonResponse
 from .serializers import RoadSegmentSerializer, SpeedReadingSerializer, TrafficIntensityThresholdSerializer
 from .permissions import IsAdminOrReadOnly
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 class CSVUploadView(APIView):
     parser_classes = (MultiPartParser, FormParser)
@@ -60,6 +62,20 @@ class RoadSegmentViewSet(viewsets.ModelViewSet):
     queryset = RoadSegment.objects.all()
     serializer_class = RoadSegmentSerializer
     permission_classes = [IsAdminOrReadOnly]
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                'intensity',
+                openapi.IN_QUERY,
+                description="Filter by traffic intensity (high, medium, low)",
+                type=openapi.TYPE_STRING,
+                enum=['high', 'medium', 'low']
+            )
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
     def get_queryset(self):
         queryset = super().get_queryset()
