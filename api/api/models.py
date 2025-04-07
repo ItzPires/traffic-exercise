@@ -42,10 +42,10 @@ class SpeedReading(models.Model):
 class TrafficIntensityThreshold(models.Model):
     medium_min = models.FloatField(default=20.0) # Medium min and high max are the same
     medium_max = models.FloatField(default=50.0) # Medium max and low min are the same
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['-updated_at']
+        ordering = ['-created_at']
 
     @classmethod
     def current(cls):
