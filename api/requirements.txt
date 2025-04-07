@@ -1,8 +1,14 @@
 asgiref==3.8.1
 Django==5.2
 djangorestframework==3.16.0
+drf-yasg==1.21.10
 GDAL==3.4.1
+inflection==0.5.1
+packaging==24.2
 psycopg2==2.9.10
+pytz==2025.2
+PyYAML==6.0.2
 sqlparse==0.5.3
 typing_extensions==4.13.0
 tzdata==2025.2
+uritemplate==4.1.1
