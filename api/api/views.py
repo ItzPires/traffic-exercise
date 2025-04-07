@@ -61,6 +61,18 @@ class RoadSegmentViewSet(viewsets.ModelViewSet):
     serializer_class = RoadSegmentSerializer
     permission_classes = [IsAdminOrReadOnly]
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        intensity = self.request.query_params.get('intensity', '').lower()
+
+        if intensity in ['high', 'medium', 'low']:
+            queryset = [segment for segment in queryset if segment.traffic_intensity == intensity]
+
+            ids = [segment.id for segment in queryset]
+            queryset = RoadSegment.objects.filter(id__in=ids)
+
+        return queryset
+
 class SpeedReadingViewSet(viewsets.ModelViewSet):
     queryset = SpeedReading.objects.all()
     serializer_class = SpeedReadingSerializer
