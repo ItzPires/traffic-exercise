@@ -14,6 +14,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework import permissions
@@ -23,7 +24,7 @@ from drf_yasg import openapi
 schema_view = get_schema_view(
     openapi.Info(
         title="API - Traffic Intensity",
-        default_version='v1',
+        default_version="v1",
         description="API for Traffic Intensity Management",
     ),
     public=True,
@@ -31,7 +32,11 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/docs/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-    path('api/', include('api.urls')),
+    path("admin/", admin.site.urls),
+    path(
+        "api/docs/",
+        schema_view.with_ui("swagger", cache_timeout=0),
+        name="schema-swagger-ui",
+    ),
+    path("api/", include("api.urls")),
 ]

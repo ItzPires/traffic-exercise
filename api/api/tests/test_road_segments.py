@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from ..models import RoadSegment, SpeedReading, TrafficIntensityThreshold
 from django.contrib.gis.geos import Point
 
+
 class RoadSegmentTests(APITestCase):
     def setUp(self):
         # Admin
@@ -140,13 +141,19 @@ class RoadSegmentTests(APITestCase):
 
     # Filter segments by traffic intensity
     def test_filter_by_traffic_intensity(self):
-        segment_low = RoadSegment.objects.create(start_point=Point(10.0, 10.0), end_point=Point(11.0, 11.0))
+        segment_low = RoadSegment.objects.create(
+            start_point=Point(10.0, 10.0), end_point=Point(11.0, 11.0)
+        )
         SpeedReading.objects.create(road_segment=segment_low, speed=60.0)  # low
 
-        segment_medium = RoadSegment.objects.create(start_point=Point(20.0, 20.0), end_point=Point(21.0, 21.0))
+        segment_medium = RoadSegment.objects.create(
+            start_point=Point(20.0, 20.0), end_point=Point(21.0, 21.0)
+        )
         SpeedReading.objects.create(road_segment=segment_medium, speed=30.0)  # medium
 
-        segment_high = RoadSegment.objects.create(start_point=Point(30.0, 30.0), end_point=Point(31.0, 31.0))
+        segment_high = RoadSegment.objects.create(
+            start_point=Point(30.0, 30.0), end_point=Point(31.0, 31.0)
+        )
         SpeedReading.objects.create(road_segment=segment_high, speed=10.0)  # high
 
         # Test low intensity filter
