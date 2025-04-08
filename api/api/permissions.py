@@ -1,4 +1,5 @@
 from rest_framework.permissions import BasePermission, SAFE_METHODS
+from django.conf import settings
 
 
 class IsAdminOrReadOnly(BasePermission):
@@ -12,5 +13,5 @@ class SensorAPIOnlyPermission(BasePermission):
     def has_permission(self, request, view):
         if request.method in ["POST"]:
             api_key = request.headers.get("X-API-KEY")
-            return api_key == "23231c7a-80a7-4810-93b3-98a18ecfbc42"
+            return api_key == settings.API_KEY_SENSOR
         return True

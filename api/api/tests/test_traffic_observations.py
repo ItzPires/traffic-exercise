@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from ..models import RoadSegment, Sensor, Car, TrafficObservation
 from django.contrib.gis.geos import Point
 import uuid
+from django.conf import settings
 
 
 class TrafficObservationTests(APITestCase):
@@ -30,7 +31,7 @@ class TrafficObservationTests(APITestCase):
         )
 
         # API keys
-        self.valid_api_key = "23231c7a-80a7-4810-93b3-98a18ecfbc42"
+        self.valid_api_key = settings.API_KEY_SENSOR
         self.invalid_api_key = "invalid-key-1234"
 
     # Create multiple traffic observations with valid API key

@@ -6,6 +6,7 @@ GDAL==3.4.1
 inflection==0.5.1
 packaging==24.2
 psycopg2==2.9.10
+python-dotenv==1.1.0
 pytz==2025.2
 PyYAML==6.0.2
 sqlparse==0.5.3
