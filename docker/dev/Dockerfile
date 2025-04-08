@@ -12,6 +12,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY ./api/ .
 
+COPY docker/dev/entrypoint.sh .
+RUN chmod +x entrypoint.sh
+
 EXPOSE 8000
 
 ENV DEBUG=True
