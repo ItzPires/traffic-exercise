@@ -1,0 +1,27 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgis/postgis:latest
+    container_name: db
+    restart: always
+    environment:
+      POSTGRES_DB: db_test
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+
+  tests:
+    build:
+      context: ../..
+      dockerfile: docker/test/Dockerfile
+    container_name: api_tests
+    depends_on:
+      - db
+    environment:
+      - DB_NAME=db_test
+      - DB_USER=user
+      - DB_PASSWORD=password
+      - DB_HOST=db
+      - DB_PORT=5432
