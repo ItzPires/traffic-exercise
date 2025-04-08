@@ -6,6 +6,10 @@ from django.contrib.gis.geos import Point
 from rest_framework.response import Response
 from rest_framework import status, viewsets, permissions
 from django.http import JsonResponse
+from django.utils import timezone
+from datetime import timedelta
+from rest_framework.decorators import action
+from rest_framework.response import Response
 from .serializers import RoadSegmentSerializer, SpeedReadingSerializer, TrafficIntensityThresholdSerializer, CarSerializer, SensorSerializer, TrafficObservationSerializer
 from .permissions import IsAdminOrReadOnly, SensorAPIOnlyPermission
 from drf_yasg.utils import swagger_auto_schema
@@ -112,6 +116,70 @@ class CarViewSet(viewsets.ModelViewSet):
     serializer_class = CarSerializer
     permission_classes = [IsAdminOrReadOnly]
     http_method_names = ['get', 'post', 'delete', 'head'] # Disable PUT/PATCH
+
+    @swagger_auto_schema(
+        operation_description="Get last 24h observations for a car",
+        responses={200: 'Success', 400: 'Bad Request', 404: 'Car Not Found'},
+        manual_parameters=[
+            openapi.Parameter(
+                'license_plate', 
+                openapi.IN_QUERY, 
+                type=openapi.TYPE_STRING,
+                required=True,
+                example="AA16AA"
+            )
+        ]
+    )
+    @action(detail=False, methods=['get'])
+    def last_24h_observations(self, request):
+        license_plate = request.query_params.get('license_plate')
+        
+        if not license_plate:
+            return Response(
+                {"error": "License plate is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        now = timezone.now()
+        start_time = now - timedelta(hours=24)
+
+        try:
+            car = Car.objects.get(license_plate=license_plate)
+            observations = TrafficObservation.objects.filter(
+                car=car,
+                timestamp__gte=start_time
+            ).select_related('sensor', 'road_segment').order_by('-timestamp')
+
+            result = {
+                'car': {
+                    'license_plate': car.license_plate,
+                    'created_at': car.created_at
+                },
+                'observations': []
+            }
+
+            for obs in observations:
+                result['observations'].append({
+                    'timestamp': obs.timestamp,
+                    'road_segment': {
+                        'id': obs.road_segment.id,
+                        'length': obs.road_segment.length,
+                        'current_speed': obs.road_segment.current_speed,
+                        'traffic_intensity': obs.road_segment.traffic_intensity
+                    },
+                    'sensor': {
+                        'uuid': str(obs.sensor.uuid),
+                        'name': obs.sensor.name
+                    }
+                })
+
+            return Response(result)
+
+        except Car.DoesNotExist:
+            return Response(
+                {"error": "Car not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
 
 class SensorViewSet(viewsets.ModelViewSet):
     queryset = Sensor.objects.all()
